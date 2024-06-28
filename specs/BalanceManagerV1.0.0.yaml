@@ -1,0 +1,394 @@
+openapi: 3.0.3
+info:
+  title: Balance Manager API
+  description: Balance Manager API Specs
+  version: 1.0.0
+servers:
+  - url: https://localhost:8080/api/v1
+tags:
+  - name: Client
+    description: Operations related to a Client.
+  - name: Account
+    description: Operations related to a Client Account.
+  - name: Transaction
+    description: Operations related to transactions committed to Accounts.
+
+paths:
+  /clientes:
+    post:
+      tags:
+        - Client
+      summary: Create a Client.
+      description: Create a Client.
+      operationId: CreateClient
+      requestBody:
+        description: Client information.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Person'
+      responses:
+        '201':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Client'
+    get:
+      tags:
+        - Client
+      summary: Get all clients.
+      description: Get all clients.
+      operationId: getAllClient
+      parameters:
+        - name: pgSize
+          in: query
+          description: 'The amount of clients per page.'
+          required: true
+          schema:
+            type: integer
+        - name: pg
+          in: query
+          description: 'The page for the bulk of clients.'
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Query Successfully Executed
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  oneOf:
+                    - $ref: '#/components/schemas/Client'
+  /clientes/{clientId}:
+    put:
+      tags:
+        - Client
+      summary: Update a Client.
+      description: Update all fields of the Client.
+      operationId: updateClient
+      parameters:
+        - name: clientId
+          in: path
+          description: Client to be modified.
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        description: Update an existent Client.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ClientPUT'
+      responses:
+        '200':
+          description: Update Successfully Executed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Client'
+    delete:
+      tags:
+        - Client
+      summary: Delete a Client
+      description: Delete an existent Client.
+      operationId: deleteClient
+      parameters:
+        - name: clientId
+          in: path
+          description: Client to be modified.
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Client successfully eliminated
+        '404':
+          description: Client not found
+  /cuentas:
+    post:
+      tags:
+        - Account
+      summary: Create an Account.
+      description: Create an Account.
+      operationId: CreateAccount
+      requestBody:
+        description: Account information.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AccountPOST'
+      responses:
+        '201':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Account'
+    get:
+      tags:
+        - Account
+      summary: Get all Accounts.
+      description: Get all Accounts.
+      operationId: getAllAccounts
+      parameters:
+        - name: pgSize
+          in: query
+          description: 'The amount of accounts per page.'
+          required: true
+          schema:
+            type: integer
+        - name: pg
+          in: query
+          description: 'The page for the bulk of accounts.'
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Query Successfully Executed
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  oneOf:
+                    - $ref: '#/components/schemas/Account'
+  /cuentas/{number}:
+    put:
+      tags:
+        - Account
+      summary: Update an Account.
+      description: Update all fields of the Account.
+      operationId: updateAccount
+      parameters:
+        - name: number
+          in: path
+          description: Account number.
+          required: true
+          schema:
+            $ref: '#/components/schemas/AccountIdentifier'
+      requestBody:
+        description: Update an existent Account.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AccountPUT'
+      responses:
+        '200':
+          description: Update Successfully Executed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Account'
+    delete:
+      tags:
+        - Account
+      summary: Delete an Account
+      description: Delete an existent Account.
+      operationId: deleteAccount
+      parameters:
+        - name: number
+          in: path
+          description: Account number.
+          required: true
+          schema:
+            $ref: '#/components/schemas/AccountIdentifier'
+      responses:
+        '200':
+          description: Account successfully eliminated
+        '404':
+          description: Client not found
+  /movimientos:
+    post:
+      tags:
+        - Transaction
+      summary: Create a Transaction.
+      description: Create a Transaction.
+      operationId: CreateTransaction
+      requestBody:
+        description: Transaction information.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TransactionPOST'
+      responses:
+        '201':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Transaction'
+        '403':
+          description: Balance out of bounds
+          content:
+            application/json:
+              schema:
+                type: string
+    get:
+      tags:
+        - Transaction
+      summary: Get all Transactions.
+      description: Get all Transactions.
+      operationId: getAllTransactions
+      parameters:
+        - name: pgSize
+          in: query
+          description: 'The amount of transactions per page.'
+          required: true
+          schema:
+            type: integer
+        - name: pg
+          in: query
+          description: 'The page for the bulk of transactions.'
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Query Successfully Executed
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  oneOf:
+                    - $ref: '#/components/schemas/Transaction'
+components:
+  schemas:
+    Person:
+      type: object
+      properties:
+        name:
+          type: string
+          example: Carlos Garcia
+        gender:
+          type: string
+          enum: [ MALE, FEMALE, OTHER]
+          example: OTHER
+        birthDate:
+          type: string
+          format: date
+          example: 2024-06-13
+        identificationCode:
+          type: string
+          pattern: ^\d{10}$
+          example: 1720012573
+        address:
+          type: string
+          example: Calle A
+        phoneNumber:
+          type: string
+          pattern: ^\+?\d{1,15}$
+          example: +5999756112
+    Client:
+      allOf:
+        - $ref: '#/components/schemas/Person'
+        - type: object
+          required:
+            - name
+            - gender
+            - birthDate
+            - identificationCode
+            - address
+            - phoneNumber
+          properties:
+            clientId:
+              type: integer
+              example: 2
+            password:
+              type: string
+              format: password
+              example: PassCode123
+            isEnabled:
+              type: boolean
+              example: true
+    Account:
+      type: object
+      properties:
+        clientId:
+          type: integer
+          example: 2
+        number:
+          $ref: '#/components/schemas/AccountIdentifier'
+        type:
+          type: string
+          enum: [ CHECKING, SAVINGS ]
+          example: SAVINGS
+        availableBalance:
+          $ref: '#/components/schemas/MoneyAmount'
+        isEnabled:
+          type: boolean
+          example: true
+    Transaction:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: 9151b21f-43be-43b4-9bf3-f4bf67cdf544
+        account:
+          $ref: '#/components/schemas/AccountIdentifier'
+        date:
+          type: string
+          format: date-time
+          example: 2024-06-13T19:19:56Z
+        type:
+          type: string
+          enum: [ CREDIT, DEBIT ]
+          example: DEBIT
+        amount:
+          $ref: '#/components/schemas/MoneyAmount'
+        currentBalance:
+          $ref: '#/components/schemas/MoneyAmount'
+    AccountIdentifier:
+      type: string
+      format: ^\d{6}$
+      example: 200012
+    MoneyAmount:
+      type: string
+      pattern: ^(\-|\+)?((\d+(\.\d*)?)|(\.\d+))$
+      example: 100.23
+
+    ClientPUT:
+      allOf:
+        - $ref: '#/components/schemas/Client'
+        - type: object
+          required:
+            - name
+            - gender
+            - birthDate
+            - identificationCode
+            - address
+            - phoneNumber
+            - password
+            - isEnabled
+    AccountPOST:
+      allOf:
+        - $ref: '#/components/schemas/Account'
+        - type: object
+          required:
+            - clientId
+            - type
+            - availableBalance
+    AccountPUT:
+      allOf:
+        - $ref: '#/components/schemas/Account'
+        - type: object
+          required:
+            - clientId
+            - type
+            - availableBalance
+            - isEnabled
+    TransactionPOST:
+      allOf:
+        - $ref: '#/components/schemas/Transaction'
+        - type: object
+          required:
+            - account
+            - date
+            - type
+            - amount
