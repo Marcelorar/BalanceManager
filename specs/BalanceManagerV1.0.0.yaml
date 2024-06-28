@@ -257,6 +257,57 @@ paths:
                 items:
                   oneOf:
                     - $ref: '#/components/schemas/Transaction'
+  /reportes/{clientId}:
+    get:
+      tags:
+        - Transaction
+      summary: Get Transactions filtered by date and client.
+      description: Get Transactions filtered by date and client.
+      operationId: getTransactionsByDateByClient
+      parameters:
+        - name: clientId
+          in: path
+          description: Client to be queried.
+          required: true
+          schema:
+            type: integer
+        - name: pgSize
+          in: query
+          description: 'The amount of transactions per page.'
+          required: true
+          schema:
+            type: integer
+        - name: pg
+          in: query
+          description: 'The page for the bulk of transactions.'
+          required: true
+          schema:
+            type: integer
+        - name: startDate
+          in: query
+          description: 'Start Date of the query.'
+          required: true
+          schema:
+            type: string
+            format: date
+        - name: endDate
+          in: query
+          description: 'Last Date of the query.'
+          required: true
+          schema:
+            type: string
+            format: date
+      responses:
+        '200':
+          description: Query Successfully Executed
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  oneOf:
+                    - $ref: '#/components/schemas/TransactionReport'
+
 components:
   schemas:
     Person:
@@ -344,6 +395,32 @@ components:
           $ref: '#/components/schemas/MoneyAmount'
         currentBalance:
           $ref: '#/components/schemas/MoneyAmount'
+    TransactionReport:
+      type: object
+      properties:
+        date:
+          type: string
+          format: date-time
+          example: 2024-06-13T19:19:56Z
+        name:
+          type: string
+          example: Carlos Garcia
+        account:
+          $ref: '#/components/schemas/AccountIdentifier'
+        accountType:
+          type: string
+          enum: [ CHECKING, SAVINGS ]
+          example: SAVINGS
+        lastBalance:
+          $ref: '#/components/schemas/MoneyAmount'
+        operation:
+          type: string
+          enum: [ CREDIT, DEBIT ]
+          example: DEBIT
+        issuedAmount:
+          $ref: '#/components/schemas/MoneyAmount'
+        currentBalance:
+          $ref: '#/components/schemas/MoneyAmount'
     AccountIdentifier:
       type: string
       format: ^\d{6}$
@@ -352,7 +429,6 @@ components:
       type: string
       pattern: ^(\-|\+)?((\d+(\.\d*)?)|(\.\d+))$
       example: 100.23
-
     ClientPUT:
       allOf:
         - $ref: '#/components/schemas/Client'

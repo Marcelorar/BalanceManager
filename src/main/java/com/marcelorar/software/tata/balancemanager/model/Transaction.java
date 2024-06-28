@@ -80,6 +80,10 @@ public class Transaction implements GetAllTransactions200ResponseInner {
 
   private String currentBalance;
 
+
+  public Transaction() {
+  }
+
   public Transaction(TransactionPOST transactionPOST) {
     this.account = transactionPOST.getAccount();
     this.date = transactionPOST.getDate();
@@ -119,8 +123,8 @@ public class Transaction implements GetAllTransactions200ResponseInner {
   
   @Schema(name = "account", example = "200012", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("account")
-  public String getAccount() {
-    return account.getNumber();
+  public Account getAccount() {
+    return account;
   }
 
   public void setAccount(Account account) {
